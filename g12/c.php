@@ -41,7 +41,6 @@ if (isset($_POST['action_login_email'])) {
                     VALUES ('$user_val', '$event_type', '$ip_addr', NOW())";
         @mysqli_query($conn, $sql_log);
 
-        // รีไดเรกต์กลับหน้าเดิม c.php พร้อมการล็อกอินเรียบร้อย
         header("Location: c.php");
         exit;
     } else {
@@ -66,6 +65,18 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
     unset($_SESSION['user']);
     header("Location: c.php");
     exit;
+}
+
+// ---------------------------------------------------------------------
+// 📌 ดึงข้อมูล Audit Logs จาก Database เพื่อนำมาแสดงใน Modal
+// ---------------------------------------------------------------------
+$audit_logs_list = [];
+$sql_fetch_logs = "SELECT * FROM audit_logs ORDER BY id DESC LIMIT 100";
+$rs_logs = @mysqli_query($conn, $sql_fetch_logs);
+if ($rs_logs) {
+    while ($row_log = mysqli_fetch_assoc($rs_logs)) {
+        $audit_logs_list[] = $row_log;
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -179,12 +190,6 @@ if (isset($_POST['submit_order'])) {
         }
     }
 }
-
-$payment_names = [
-    'cod'       => '🚚 เก็บเงินปลายทาง (Cash on Delivery)',
-    'promptpay' => '📱 โอนเงินผ่านธนาคาร / QR PromptPay',
-    'credit'    => '💳 บัตรเครดิต / เดบิต'
-];
 
 // ---------------------------------------------------------------------
 // 📌 ระบบค้นหา/ตรวจสอบสินค้าที่สั่งซื้อ (Check Orders)
@@ -302,24 +307,10 @@ $sql_prod = "SELECT * FROM products ORDER BY product_id ASC";
 $rs_prod = mysqli_query($conn, $sql_prod);
 
 $grouped_products = [];
-$all_products_for_bot = [];
-
 if ($rs_prod && mysqli_num_rows($rs_prod) > 0) {
     while ($prod = mysqli_fetch_assoc($rs_prod)) {
         $cat_id = $prod['category_id'];
         $grouped_products[$cat_id][] = $prod;
-
-        $cat_name = isset($categories[$cat_id]) ? $categories[$cat_id]['category_name'] : 'สินค้าทั่วไป';
-        $all_products_for_bot[] = [
-            'id'        => $prod['product_id'],
-            'name'      => isset($prod['product_name']) ? $prod['product_name'] : (isset($prod['name']) ? $prod['name'] : 'สินค้า'),
-            'code'      => isset($prod['product_code']) ? $prod['product_code'] : (isset($prod['sku']) ? $prod['sku'] : "P".$prod['product_id']),
-            'price'     => number_format($prod['price'], 2),
-            'raw_price' => floatval($prod['price']),
-            'stock'     => intval($prod['stock']),
-            'category'  => $cat_name,
-            'desc'      => isset($prod['description']) ? $prod['description'] : ''
-        ];
     }
 }
 
@@ -511,6 +502,7 @@ $total_cart_items = array_sum($_SESSION['cart']);
             background: white; width: 90%; max-width: 600px; max-height: 85vh;
             border-radius: var(--radius-lg); padding: 24px; overflow-y: auto; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
+        .modal-content.large-modal { max-width: 900px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 18px; }
         .close-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); }
 
@@ -530,6 +522,11 @@ $total_cart_items = array_sum($_SESSION['cart']);
             width: 100%; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.2s;
         }
         .btn-submit-order:hover { background: #059669; }
+
+        /* Style สำหรับ Audit Logs Table */
+        .badge-event { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-event.login { background: #dcfce7; color: #166534; }
+        .badge-event.logout { background: #fee2e2; color: #991b1b; }
 
         @media (max-width: 992px) { 
             .product-grid { grid-template-columns: repeat(3, 1fr); } 
@@ -554,6 +551,9 @@ $total_cart_items = array_sum($_SESSION['cart']);
         <a href="c.php" class="brand-logo">🎸 GUITAR REA <span>STORE</span></a>
         <div class="user-nav-box">
             <button class="btn-nav-action" onclick="openOrderSearchModal()">📋 ตรวจสอบคำสั่งซื้อ</button>
+            
+            <!-- 🟢 ปุ่มเปิดระบบหลังบ้าน (Audit Logs) บน Navbar -->
+            <button class="btn-nav-action" onclick="openAuditLogModal()" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); color: #fef08a;">📜 ดู Log ระบบ</button>
 
             <?php if (isset($_SESSION['user'])) { ?>
                 <div class="user-badge">
@@ -605,7 +605,7 @@ $total_cart_items = array_sum($_SESSION['cart']);
                 </div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon">🛡️️</span>
+                <span class="feature-icon">🛡</span>
                 <div class="feature-text">
                     <h4>รับประกันสินค้าแท้</h4>
                     <p>รับประกันศูนย์ไทย 100%</p>
@@ -850,6 +850,49 @@ $total_cart_items = array_sum($_SESSION['cart']);
         </div>
     </div>
 
+    <!-- 📜 AUDIT LOGS MODAL (ระบบหลังบ้าน) -->
+    <div class="modal-overlay" id="auditLogModal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>📜 ประวัติการเข้าใช้งานระบบ (Audit Logs)</h3>
+                <button class="close-btn" onclick="closeAuditLogModal()">&times;</button>
+            </div>
+            
+            <?php if (!empty($audit_logs_list)) { ?>
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th># ID</th>
+                            <th>ผู้ใช้งาน (User / Email)</th>
+                            <th>เหตุการณ์ (Event)</th>
+                            <th>IP Address</th>
+                            <th>วันเวลาที่ทำรายการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($audit_logs_list as $log) { 
+                            $is_login = strpos(strtoupper($log['event_type']), 'LOGIN') !== false;
+                        ?>
+                            <tr>
+                                <td><b>#<?php echo $log['id']; ?></b></td>
+                                <td><?php echo htmlspecialchars($log['user'] ?? 'N/A'); ?></td>
+                                <td>
+                                    <span class="badge-event <?php echo $is_login ? 'login' : 'logout'; ?>">
+                                        <?php echo htmlspecialchars($log['event_type']); ?>
+                                    </span>
+                                </td>
+                                <td><code><?php echo htmlspecialchars($log['ip_address'] ?? '127.0.0.1'); ?></code></td>
+                                <td style="color: var(--text-muted); font-size: 12px;"><?php echo $log['created_at']; ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            <?php } else { ?>
+                <p style="text-align: center; color: var(--text-muted); padding: 30px;">ไม่พบประวัติการใช้งานในระบบ</p>
+            <?php } ?>
+        </div>
+    </div>
+
     <!-- 📄 RECEIPT MODAL -->
     <?php if ($receipt_data) { ?>
         <div class="modal-overlay active" id="receiptModal">
@@ -964,6 +1007,11 @@ $total_cart_items = array_sum($_SESSION['cart']);
         function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
         function openOrderSearchModal() { document.getElementById('orderSearchModal').classList.add('active'); }
         function closeOrderSearchModal() { document.getElementById('orderSearchModal').classList.remove('active'); }
+        
+        // 📜 Controls สำหรับเปิด-ปิด Modal Audit Logs
+        function openAuditLogModal() { document.getElementById('auditLogModal').classList.add('active'); }
+        function closeAuditLogModal() { document.getElementById('auditLogModal').classList.remove('active'); }
+
         function toggleChatbot() { document.getElementById('chatbotWindow').classList.toggle('active'); }
 
         // Auto Open Cart if URL param exists
