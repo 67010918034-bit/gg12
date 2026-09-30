@@ -555,21 +555,6 @@ $total_cart_items = array_sum($_SESSION['cart']);
         }
         .cart-badge { background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px; }
 
-        .floating-chat-btn {
-            position: fixed; bottom: 25px; left: 25px; background: var(--primary); color: #fff; border: none;
-            padding: 14px 22px; border-radius: 30px; font-size: 14px; font-weight: 600;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.3); cursor: pointer; z-index: 999;
-        }
-
-        .chatbot-window {
-            display: none; position: fixed; bottom: 85px; left: 25px; width: 420px; height: 680px; max-height: calc(100vh - 120px); max-width: calc(100vw - 50px);
-            background: #fff; border-radius: var(--radius-lg); box-shadow: 0 12px 35px rgba(0,0,0,0.25);
-            z-index: 1000; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color);
-        }
-        .chatbot-window.active { display: flex; }
-        .chatbot-header { background: var(--primary); color: #fff; padding: 12px 18px; font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .close-chat-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
-
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); z-index: 1000;
@@ -617,7 +602,6 @@ $total_cart_items = array_sum($_SESSION['cart']);
         @media (max-width: 480px) { 
             .product-grid { grid-template-columns: repeat(1, 1fr); } 
             .features-grid { grid-template-columns: 1fr; }
-            .chatbot-window { bottom: 0; left: 0; width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; border-radius: 0; }
         }
     </style>
 </head>
@@ -787,13 +771,28 @@ $total_cart_items = array_sum($_SESSION['cart']);
         </div>
     </footer>
 
-    <!-- 🛒 FLOATING BUTTONS -->
+    <!-- 🛒 FLOATING BUTTON (ตะกร้าสินค้า) -->
     <button class="floating-cart-btn" onclick="openCartModal()">
         🛒 ตะกร้าสินค้า
         <?php if ($total_cart_items > 0) { ?>
             <span class="cart-badge"><?php echo $total_cart_items; ?></span>
         <?php } ?>
     </button>
+
+    <!-- 🤖 FLOATING CHATBOT BUTTON (DIFY CHATBOT) -->
+    <div id="dify-chat-container" style="position: fixed; bottom: 25px; left: 25px; z-index: 9999;">
+        <button onclick="toggleDifyChat()" style="background: var(--primary); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 14px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.4); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            💬 <span>คุยกับผู้ช่วย AI</span>
+        </button>
+        
+        <div id="dify-iframe-wrapper" style="display: none; position: absolute; bottom: 60px; left: 0; width: 400px; height: 600px; max-width: 90vw; max-height: 80vh; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; border: 1px solid var(--border-color);">
+            <iframe
+                src="https://udify.app/chatbot/MhX5u5mK0EmvvK20"
+                style="width: 100%; height: 100%; border: none;"
+                allow="microphone; clipboard-write">
+            </iframe>
+        </div>
+    </div>
 
     <!-- 🛍️ MODALS SECTION -->
     
@@ -1099,6 +1098,16 @@ $total_cart_items = array_sum($_SESSION['cart']);
         function openOrderSearchModal() { openModal('searchOrderModal'); }
         function openAuditLogModal() { openModal('auditLogModal'); }
         function openAdminDashboardModal() { openModal('adminDashboardModal'); }
+
+        // สลับเปิด/ปิด Dify Chatbot
+        function toggleDifyChat() {
+            var chatBox = document.getElementById("dify-iframe-wrapper");
+            if (chatBox.style.display === "none" || chatBox.style.display === "") {
+                chatBox.style.display = "block";
+            } else {
+                chatBox.style.display = "none";
+            }
+        }
 
         // กรองหมวดหมู่สินค้า
         function filterCategory(catId, btn) {
