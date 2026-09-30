@@ -29,35 +29,43 @@ if (isset($_POST['login_admin'])) {
         } else {
             $username_clean = mysqli_real_escape_string($conn, $username);$password_clean = mysqli_real_escape_string($conn,$password);
 
-            // ค้นหาข้อมูลผู้ใช้ (รองรับทั้ง name, username, user, email)
-            $sql = "SELECT * FROM `$table_found` 
-                    WHERE (`name` = '$username_clean' 
-                       OR `username` = '$username_clean' 
-                       OR `user` = '$username_clean' 
-                       OR `email` = '$username_clean') 
-                      AND `password` = '$password_clean' 
-                    LIMIT 1";
+            // ดึงชื่อคอลัมน์ทั้งหมดในตารางเพื่อป้องกันข้อผิดพลาดคอลัมน์ไม่มีจริง
+            $col_res = mysqli_query($conn, "SHOW COLUMNS FROM `$table_found`");
+            $columns = [];
+            while ($c = mysqli_fetch_assoc($col_res)) {
+                $columns[] =$c['Field'];
+            }
+
+            // สร้างเงื่อนไขในการค้นหาเฉพาะคอลัมน์ที่มีอยู่จริงในตาราง
+            $where_conditions = [];$search_fields = ['name', 'username', 'user', 'email', 'admin_name', 'admin_user'];
+            
+            foreach ($search_fields as$field) {
+                if (in_array($field, $columns)) {$where_conditions[] = "`$field` = '$username_clean'";
+                }
+            }
+
+            // ถ้าไม่มีคอลัมน์ชื่อตรงเลย ให้ลองค้นหาคอลัมน์แรกสุดของตาราง
+            if (empty($where_conditions) && !empty($columns)) {$where_conditions[] = "`{$columns[0]}` = '$username_clean'";
+            }
+
+            $where_sql = implode(' OR ',$where_conditions);
+            
+            // เช็ครหัสผ่าน
+            $pass_field = in_array('password',$columns) ? 'password' : (in_array('pass', $columns) ? 'pass' :$columns[1] ?? 'password');
+
+            $sql = "SELECT * FROM `$table_found` WHERE ($where_sql) AND `$pass_field` = '$password_clean' LIMIT 1";
             
             $rs = @mysqli_query($conn,$sql);
 
-            if ($rs && mysqli_num_rows($rs) > 0) {
-                $row = mysqli_fetch_assoc($rs);
-                
-                // -------------------------------------------------------------
-                // 🎯 ตั้งค่า Session สำหรับล็อกอิน
-                // -------------------------------------------------------------
-                $_SESSION['admin_login'] = true;
-                $_SESSION['admin']       =$row['username'] ?? $row['name'] ?? $row['email'] ?? 'Admin';
+            if ($rs && mysqli_num_rows($rs) > 0) {$row = mysqli_fetch_assoc($rs);$_SESSION['admin_login'] = true;
+                $_SESSION['admin']       =$username;
                 $_SESSION['role']        = 'admin';$_SESSION['admin_id']    = $row['admin_id'] ?? $row['id'] ?? 1;
-                $_SESSION['user_name']   =$row['name'] ?? $row['username'] ?? $row['user'] ?? 'Admin';
-                $_SESSION['username']    =$_SESSION['user_name'];
-                
-                // สำหรับไฟล์ c.php หรือระบบอื่นที่เรียกใช้ $_SESSION['user']$_SESSION['user'] = [
+                $_SESSION['user_name']   = $row['name'] ?? $row['username'] ?? $row['user'] ?? $username;
+                $_SESSION['username']    = $_SESSION['user_name'];$_SESSION['user'] = [
                     'fullname' => $_SESSION['user_name'],
                     'email'    => $username
                 ];
 
-                // 🚀 เปลี่ยนเป้าหมายเป็น admin.php (หน้าจัดการสต็อก & ยอดขาย)
                 header("Location: admin.php");
                 exit;
             } else {
