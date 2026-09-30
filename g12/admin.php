@@ -629,18 +629,19 @@ $total_cart_items = array_sum($_SESSION['cart']);
             <button class="btn-nav-action" onclick="openOrderSearchModal()">📋 ตรวจสอบคำสั่งซื้อ</button>
             <button class="btn-nav-action" onclick="openAuditLogModal()" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); color: #fef08a;">📜 ดู Log ระบบ</button>
 
-            <!-- 🛡️ ส่วนควบคุม ADMIN LOGIN / DASHBOARD BUTTON -->
+            <!-- 🔐 เพิ่มปุ่ม ADMIN LOGIN / DASHBOARD ตรงนี้ -->
             <?php if (isset($_SESSION['admin_login'])) { ?>
                 <button class="btn-nav-action" onclick="openAdminDashboardModal()" style="background: #f59e0b; color: #0f172a; font-weight: 700;">
                     🛡️ แผงควบคุม Admin
                 </button>
                 <a href="c.php?action=admin_logout" class="btn-logout" style="color: #fca5a5;" onclick="return confirm('ออกจากระบบ Admin?')">ออกจาก Admin</a>
             <?php } else { ?>
-                <button class="btn-nav-action" onclick="openAdminLoginModal()" style="border-color: #f59e0b; color: #fef08a;">
+                <button class="btn-nav-action" onclick="openAdminLoginModal()" style="border-color: #f59e0b; color: #fef08a; background: rgba(245, 158, 11, 0.15);">
                     🔐 Admin Login
                 </button>
             <?php } ?>
 
+            <!-- 👤 ปุ่มเข้าสู่ระบบของลูกค้า -->
             <?php if (isset($_SESSION['user'])) { ?>
                 <div class="user-badge">
                     📧 <b><?php echo htmlspecialchars($_SESSION['user']['email']); ?></b>
@@ -655,57 +656,44 @@ $total_cart_items = array_sum($_SESSION['cart']);
     <!-- 🌄 HERO HOMEPAGE SLIDER SECTION -->
     <section class="hero-slider-wrapper">
         <div class="hero-slide active">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1600&q=80" alt="Guitar Rea Store Banner 1" class="hero-slide-bg">
+            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1600&q=80" class="hero-slide-bg" alt="Guitar Store Banner">
             <div class="hero-banner-content">
-                <span class="hero-tag">🔥 OFFICIAL GUITAR STORE</span>
-                <h1>GUITAR REA <span>STORE</span></h1>
-                <p>ศูนย์รวมกีตาร์ไฟฟ้า โปร่ง คลาสสิก ตู้แอมป์ และอุปกรณ์ดนตรีคุณภาพพรีเมียม การันตีของแท้พร้อมบริการหลังการขาย</p>
-                <div class="hero-actions">
-                    <a href="#cat-group" class="btn-hero-primary">🛍️ เลือกซื้อสินค้าทันที</a>
-                    <button class="btn-hero-secondary" onclick="openOrderSearchModal()">📋 ตรวจสอบสินค้าที่สั่ง</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="hero-slide">
-            <img src="https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?auto=format&fit=crop&w=1600&q=80" alt="Guitar Rea Store Banner 2" class="hero-slide-bg">
-            <div class="hero-banner-content">
-                <span class="hero-tag">🎸 NEW ARRIVALS</span>
+                <span class="hero-tag">✨ NEW ARRIVALS</span>
                 <h1>สินค้ามาใหม่ <span>โปรโมชั่นพิเศษ</span></h1>
                 <p>สัมผัสพลังเสียงระดับสตูดิโอด้วยกีตาร์คัดสรรเกรดพรีเมียม พร้อมส่วนลดสูงสุดในรอบปี</p>
                 <div class="hero-actions">
-                    <a href="#cat-group" class="btn-hero-primary">🔥 ดูโปรโมชั่นพิเศษ</a>
+                    <a href="#cat-group" class="btn-hero-primary">⚡ ดูโปรโมชั่นพิเศษ</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 🌟 FEATURES SECTION -->
+    <!-- ⚡ FEATURES SECTION -->
     <section class="features-section">
         <div class="features-grid">
             <div class="feature-item">
-                <span class="feature-icon">🚚</span>
+                <div class="feature-icon">🚚</div>
                 <div class="feature-text">
                     <h4>จัดส่งฟรีทั่วไทย</h4>
                     <p>สั่งซื้อครบ 1,500 บาทขึ้นไป</p>
                 </div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon">🛡</span>
+                <div class="feature-icon">🛡️</div>
                 <div class="feature-text">
                     <h4>รับประกันสินค้าแท้</h4>
                     <p>รับประกันศูนย์ไทย 100%</p>
                 </div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon">💳</span>
+                <div class="feature-icon">💳</div>
                 <div class="feature-text">
                     <h4>ชำระเงินสะดวก</h4>
                     <p>โอนเงิน / QR / เก็บเงินปลายทาง</p>
                 </div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon">🎧</span>
+                <div class="feature-icon">🎧</div>
                 <div class="feature-text">
                     <h4>บริการด้วยใจ</h4>
                     <p>ปรึกษาทีมงานมืออาชีพได้ 24 ชม.</p>
@@ -714,54 +702,55 @@ $total_cart_items = array_sum($_SESSION['cart']);
         </div>
     </section>
 
-    <!-- 🔍 SEARCH & CATEGORY NAV -->
+    <!-- 🔍 SEARCH SECTION -->
     <div class="search-wrapper">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 ค้นหากีตาร์, อุปกรณ์ดนตรี..." onkeyup="filterProducts()">
     </div>
 
+    <!-- 🏷️ CATEGORY FILTER NAVBAR -->
     <div class="category-nav" id="cat-group">
-        <button class="cat-pill active" onclick="filterCategory('all', this)">ทั้งหมด</button>
-        <?php foreach ($categories as $cid => $cinfo) { ?>
-            <button class="cat-pill" onclick="filterCategory(<?php echo $cid; ?>, this)"><?php echo htmlspecialchars($cinfo['category_name']); ?></button>
+        <button class="cat-pill active" onclick="filterCategory('all')">ทั้งหมด</button>
+        <?php foreach ($categories as $cat_id => $cat) { ?>
+            <button class="cat-pill" onclick="filterCategory('cat-<?php echo $cat_id; ?>')"><?php echo htmlspecialchars($cat['category_name']); ?></button>
         <?php } ?>
     </div>
 
-    <!-- 🛒 MAIN PRODUCT CONTAINER -->
+    <!-- 📦 MAIN PRODUCT LIST CONTAINER -->
     <div class="container">
-        <?php if (!empty($grouped_products)) { ?>
-            <?php foreach ($grouped_products as $cat_id => $prods) { 
-                $cat_title = isset($categories[$cat_id]) ? $categories[$cat_id]['category_name'] : 'สินค้าทั่วไป';
-            ?>
-                <div class="section-group product-section-group" data-catid="<?php echo $cat_id; ?>">
-                    <div class="section-header">
-                        <h2 class="section-title">🎸 <?php echo htmlspecialchars($cat_title); ?></h2>
+        <?php foreach ($categories as $cat_id => $cat) { 
+            $prods = isset($grouped_products[$cat_id]) ? $grouped_products[$cat_id] : [];
+        ?>
+            <div class="section-group cat-block cat-<?php echo $cat_id; ?>">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">🎸 <?php echo htmlspecialchars($cat['category_name']); ?></h2>
+                        <p style="font-size: 12px; color: var(--text-muted);"><?php echo htmlspecialchars($cat['description']); ?></p>
                     </div>
+                </div>
+
+                <?php if (empty($prods)) { ?>
+                    <p style="font-size: 13px; color: var(--text-muted); font-style: italic;">ไม่มีสินค้าในหมวดหมู่นี้</p>
+                <?php } else { ?>
                     <div class="product-grid">
-                        <?php foreach ($prods as $prod) { 
-                            $p_id    = $prod['product_id'];
-                            $p_name  = $prod['product_name'];
-                            $p_desc  = $prod['description'] ?? '';
-                            $p_price = number_format($prod['price'], 2);
-                            $p_stock = intval($prod['stock']);
-                            $p_img   = getProductImageDirect($prod);
+                        <?php foreach ($prods as $p) { 
+                            $img_src = getProductImageDirect($p);
+                            $in_stock = ($p['stock'] > 0);
                         ?>
-                            <div class="card product-card" data-title="<?php echo htmlspecialchars(mb_strtolower($p_name)); ?>">
+                            <div class="card product-card" data-name="<?php echo htmlspecialchars(mb_strtolower($p['product_name'])); ?>">
                                 <div class="card-img-box">
-                                    <span class="badge-code">#<?php echo $p_id; ?></span>
-                                    <?php if ($p_stock > 0) { ?>
-                                        <span class="badge-stock in-stock">มีสินค้า (<?php echo $p_stock; ?>)</span>
-                                    <?php } else { ?>
-                                        <span class="badge-stock out-stock">สินค้าหมด</span>
-                                    <?php } ?>
-                                    <img src="<?php echo htmlspecialchars($p_img); ?>" alt="<?php echo htmlspecialchars($p_name); ?>" loading="lazy">
+                                    <span class="badge-code">#P<?php echo $p['product_id']; ?></span>
+                                    <span class="badge-stock <?php echo $in_stock ? 'in-stock' : 'out-stock'; ?>">
+                                        <?php echo $in_stock ? 'มีสินค้า ' . $p['stock'] . ' ชิ้น' : 'สินค้าหมด'; ?>
+                                    </span>
+                                    <img src="<?php echo htmlspecialchars($img_src); ?>" alt="<?php echo htmlspecialchars($p['product_name']); ?>" loading="lazy">
                                 </div>
                                 <div class="card-body">
-                                    <h3 class="card-title"><?php echo htmlspecialchars($p_name); ?></h3>
-                                    <p class="card-desc"><?php echo htmlspecialchars($p_desc); ?></p>
+                                    <div class="card-title"><?php echo htmlspecialchars($p['product_name']); ?></div>
+                                    <div class="card-desc"><?php echo htmlspecialchars($p['description'] ?? ''); ?></div>
                                     <div class="card-footer">
-                                        <span class="price">฿<?php echo $p_price; ?></span>
-                                        <?php if ($p_stock > 0) { ?>
-                                            <a href="c.php?action=add&id=<?php echo $p_id; ?>" class="btn-cart">🛒 ใส่ตะกร้า</a>
+                                        <div class="price">฿<?php echo number_format($p['price'], 2); ?></div>
+                                        <?php if ($in_stock) { ?>
+                                            <a href="c.php?action=add&id=<?php echo $p['product_id']; ?>" class="btn-cart">🛒 ใส่ตะกร้า</a>
                                         <?php } else { ?>
                                             <button class="btn-cart disabled" disabled>สินค้าหมด</button>
                                         <?php } ?>
@@ -770,48 +759,66 @@ $total_cart_items = array_sum($_SESSION['cart']);
                             </div>
                         <?php } ?>
                     </div>
-                </div>
-            <?php } ?>
-        <?php } else { ?>
-            <p style="text-align: center; color: var(--text-muted); margin: 40px 0;">ไม่พบข้อมูลสินค้าในระบบ</p>
+                <?php } ?>
+            </div>
         <?php } ?>
     </div>
 
-    <!-- 🤖 CHATBOT WINDOW & BUTTON -->
-    <button class="floating-chat-btn" onclick="toggleChatbot()">🤖 ผู้ช่วย AI</button>
-
-    <div class="chatbot-window" id="chatbotWindow">
-        <div class="chatbot-header">
-            <span>🤖 ผู้ช่วยตอบคำถาม Guitar Rea</span>
-            <button class="close-chat-btn" onclick="toggleChatbot()">&times;</button>
+    <!-- 🌐 SITE FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>GUITAR REA STORE</h4>
+                <p>ร้านจำหน่ายกีตาร์และอุปกรณ์ดนตรีพรีเมียม คัดสรรคุณภาพเพื่อมือกีตาร์ทุกคน</p>
+            </div>
+            <div class="footer-col">
+                <h4>ติดต่อเรา</h4>
+                <p>📍 Bangkok, Thailand</p>
+                <p>📞 02-123-4567</p>
+                <p>📧 contact@guitarreastore.com</p>
+            </div>
+            <div class="footer-col">
+                <h4>หมวดหมู่ยอดนิยม</h4>
+                <p>• กีตาร์ไฟฟ้า</p>
+                <p>• กีตาร์โปร่ง</p>
+                <p>• ตู้แอมป์ & เอฟเฟกต์</p>
+            </div>
+            <div class="footer-col">
+                <h4>การรับประกัน</h4>
+                <p>สินค้ารับประกันศูนย์ไทย มั่นใจ ของแท้ 100% บริการหลังการขายประทับใจ</p>
+            </div>
         </div>
-        <iframe
-            src="https://udify.app/chatbot/MhX5u5mK0EmvvK20"
-            style="width: 100%; height: 100%; border: none;"
-            allow="microphone;clipboard-write">
-        </iframe>
-    </div>
+    </footer>
 
-    <!-- 🛒 FLOATING CART BUTTON -->
+    <!-- 🛒 FLOATING BUTTONS -->
     <button class="floating-cart-btn" onclick="openCartModal()">
         🛒 ตะกร้าสินค้า <span class="cart-badge"><?php echo $total_cart_items; ?></span>
     </button>
 
-    <!-- 🛒 CART MODAL -->
+    <button class="floating-chat-btn" onclick="toggleChatbot()">
+        🤖 ผู้ช่วย AI
+    </button>
+
+    <!-- 🤖 CHATBOT WINDOW -->
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <span>🤖 ผู้ช่วยตอบคำถาม AI</span>
+            <button class="close-chat-btn" onclick="toggleChatbot()">✕</button>
+        </div>
+        <iframe src="http://157.85.105.133/gg12/g12/admin.php" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+    <!-- 🛒 MODAL: CART & CHECKOUT -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>🛒 ตะกร้าสินค้าของคุณ</h3>
-                <button class="close-btn" onclick="closeCartModal()">&times;</button>
+                <button class="close-btn" onclick="closeCartModal()">✕</button>
             </div>
-            
-            <?php if (!empty($_SESSION['cart'])) { 
-                $cart_ids = array_keys($_SESSION['cart']);
-                $ids_str  = implode(',', array_map('intval', $cart_ids));
-                $sql_c    = "SELECT * FROM products WHERE product_id IN ($ids_str)";
-                $rs_c     = mysqli_query($conn, $sql_c);
-                $grand_total = 0;
-            ?>
+
+            <?php if (empty($_SESSION['cart'])) { ?>
+                <p style="text-align: center; color: var(--text-muted); padding: 30px 0;">ไม่มีสินค้าในตะกร้า</p>
+            <?php } else { ?>
                 <form action="c.php" method="POST">
                     <table class="cart-table">
                         <thead>
@@ -824,107 +831,81 @@ $total_cart_items = array_sum($_SESSION['cart']);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($item = mysqli_fetch_assoc($rs_c)) { 
-                                $pid   = $item['product_id'];
-                                $qty   = $_SESSION['cart'][$pid];
-                                $sub   = $item['price'] * $qty;
-                                $grand_total += $sub;
+                            <?php 
+                            $cart_total = 0;
+                            $ids = array_keys($_SESSION['cart']);
+                            $ids_implode = implode(',', array_map('intval', $ids));
+                            
+                            if (!empty($ids_implode)) {
+                                $sql_c = "SELECT * FROM products WHERE product_id IN ($ids_implode)";
+                                $rs_c = mysqli_query($conn, $sql_c);
+                                while ($cp = mysqli_fetch_assoc($rs_c)) {
+                                    $qty = $_SESSION['cart'][$cp['product_id']];
+                                    $subtotal = $cp['price'] * $qty;
+                                    $cart_total += $subtotal;
                             ?>
                                 <tr>
-                                    <td><b><?php echo htmlspecialchars($item['product_name']); ?></b></td>
-                                    <td>฿<?php echo number_format($item['price'], 2); ?></td>
+                                    <td><?php echo htmlspecialchars($cp['product_name']); ?></td>
+                                    <td>฿<?php echo number_format($cp['price'], 2); ?></td>
                                     <td>
-                                        <input type="number" name="qty[<?php echo $pid; ?>]" value="<?php echo $qty; ?>" min="1" max="<?php echo $item['stock']; ?>" class="qty-input">
+                                        <input type="number" name="qty[<?php echo $cp['product_id']; ?>]" value="<?php echo $qty; ?>" min="0" class="qty-input">
                                     </td>
-                                    <td>฿<?php echo number_format($sub, 2); ?></td>
-                                    <td><a href="c.php?action=remove&id=<?php echo $pid; ?>" style="color: #ef4444; text-decoration: none;">❌</a></td>
+                                    <td>฿<?php echo number_format($subtotal, 2); ?></td>
+                                    <td>
+                                        <a href="c.php?action=remove&id=<?php echo $cp['product_id']; ?>" style="color: #ef4444; text-decoration: none;">✕</a>
+                                    </td>
                                 </tr>
-                            <?php } ?>
+                            <?php } } ?>
                         </tbody>
                     </table>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <button type="submit" name="update_cart" style="background: var(--text-muted); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔄 อัปเดตจำนวน</button>
-                        <span style="font-size: 16px; font-weight: 700; color: var(--accent-orange-hover);">ราคารวม: ฿<?php echo number_format($grand_total, 2); ?></span>
+                        <button type="submit" name="update_cart" class="btn-nav-action" style="background: #3b82f6; color: white;">🔄 อัปเดตจำนวน</button>
+                        <div style="font-size: 16px; font-weight: 700; color: var(--accent-orange-hover);">
+                            ยอดรวมทั้งหมด: ฿<?php echo number_format($cart_total, 2); ?>
+                        </div>
                     </div>
                 </form>
 
+                <!-- ฟอร์มสั่งซื้อ -->
                 <form action="c.php" method="POST" class="checkout-form">
-                    <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--primary);">📝 กรอกข้อมูลจัดส่ง</h4>
+                    <h4 style="margin-bottom: 12px;">📦 ข้อมูลการจัดส่งและการชำระเงิน</h4>
+                    
                     <div class="form-group">
                         <label>ชื่อ-นามสกุล ผู้รับ:</label>
                         <input type="text" name="cust_name" required value="<?php echo htmlspecialchars($_SESSION['user']['fullname'] ?? ''); ?>">
                     </div>
+
                     <div class="form-group">
                         <label>เบอร์โทรศัพท์:</label>
                         <input type="text" name="cust_phone" required value="<?php echo htmlspecialchars($_SESSION['user']['phone'] ?? ''); ?>">
                     </div>
+
                     <div class="form-group">
                         <label>ที่อยู่จัดส่ง:</label>
-                        <textarea name="cust_address" rows="3" required><?php echo htmlspecialchars($_SESSION['user']['address'] ?? ''); ?></textarea>
+                        <textarea name="cust_address" rows="2" required><?php echo htmlspecialchars($_SESSION['user']['address'] ?? ''); ?></textarea>
                     </div>
+
                     <div class="form-group">
                         <label>ช่องทางการชำระเงิน:</label>
                         <select name="payment_method">
-                            <option value="cod">เก็บเงินปลายทาง (COD)</option>
-                            <option value="transfer">โอนเงินผ่านธนาคาร / QR Code</option>
+                            <option value="cod">ชำระเงินปลายทาง (COD)</option>
+                            <option value="bank_transfer">โอนเงินผ่านธนาคาร / PromptPay</option>
                         </select>
                     </div>
+
                     <button type="submit" name="submit_order" class="btn-submit-order">✅ ยืนยันการสั่งซื้อ</button>
                 </form>
-            <?php } else { ?>
-                <p style="text-align: center; color: var(--text-muted); padding: 30px 0;">ไม่มีสินค้าในตะกร้า</p>
             <?php } ?>
         </div>
     </div>
 
-    <!-- 🔑 USER LOGIN MODAL -->
-    <div class="modal-overlay" id="authModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>✉️ เข้าสู่ระบบ / ลงทะเบียนผู้ใช้</h3>
-                <button class="close-btn" onclick="closeAuthModal()">&times;</button>
-            </div>
-            <?php if (!empty($auth_error)) { ?>
-                <div style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 12px;">
-                    <?php echo $auth_error; ?>
-                </div>
-            <?php } ?>
-            <form action="c.php" method="POST">
-                <div class="form-group">
-                    <label>อีเมล (Required):</label>
-                    <input type="email" name="login_email" required placeholder="example@email.com">
-                </div>
-                <div class="form-group">
-                    <label>ชื่อ-นามสกุล:</label>
-                    <input type="text" name="login_fullname" placeholder="สมชาย ใจดี">
-                </div>
-                <div class="form-group">
-                    <label>เบอร์โทรศัพท์:</label>
-                    <input type="text" name="login_phone" placeholder="0812345678">
-                </div>
-                <div class="form-group">
-                    <label>ที่อยู่จัดส่ง:</label>
-                    <textarea name="login_address" rows="2" placeholder="ที่อยู่ของคุณ..."></textarea>
-                </div>
-                <button type="submit" name="action_login_email" class="btn-submit-order">เข้าสู่ระบบ</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 🔐 ADMIN LOGIN MODAL -->
+    <!-- 🔐 MODAL: ADMIN LOGIN -->
     <div class="modal-overlay" id="adminLoginModal">
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
-                <h3>🔐 เข้าสู่ระบบผู้ดูแลระบบ (Admin)</h3>
-                <button class="close-btn" onclick="closeAdminLoginModal()">&times;</button>
+                <h3>🔐 เข้าสู่ระบบ Admin</h3>
+                <button class="close-btn" onclick="closeAdminLoginModal()">✕</button>
             </div>
-            
-            <?php if (!empty($admin_error)) { ?>
-                <div style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 12px;">
-                    <?php echo $admin_error; ?>
-                </div>
-            <?php } ?>
-
             <form action="c.php" method="POST">
                 <div class="form-group">
                     <label>ชื่อผู้ใช้งาน (Username):</label>
@@ -934,86 +915,59 @@ $total_cart_items = array_sum($_SESSION['cart']);
                     <label>รหัสผ่าน (Password):</label>
                     <input type="password" name="admin_password" required placeholder="••••••••">
                 </div>
-                <button type="submit" name="action_admin_login" class="btn-submit-order" style="background: #f59e0b; color: #0f172a; font-weight: bold;">
-                    เข้าสู่ระบบ Admin
-                </button>
+                <button type="submit" name="action_admin_login" class="btn-submit-order" style="background: #f59e0b;">เข้าสู่ระบบ Admin</button>
             </form>
         </div>
     </div>
 
-    <!-- 🛡️️ ADMIN DASHBOARD MODAL -->
+    <!-- 🛡️ MODAL: ADMIN DASHBOARD -->
     <?php if (isset($_SESSION['admin_login'])) { ?>
     <div class="modal-overlay" id="adminDashboardModal">
         <div class="modal-content large-modal">
             <div class="modal-header">
-                <h3>🛡️ ระบบจัดการหลังร้าน (Admin Dashboard)</h3>
-                <button class="close-btn" onclick="closeAdminDashboardModal()">&times;</button>
+                <h3>🛡️ แผงควบคุมระบบสำหรับ Admin</h3>
+                <button class="close-btn" onclick="closeAdminDashboardModal()">✕</button>
             </div>
-
-            <?php if (!empty($stock_msg)) { ?>
-                <div style="background: #dcfce7; color: #166534; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;">
-                    ✅ <?php echo $stock_msg; ?>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1; background: #eff6ff; padding: 15px; border-radius: 10px;">
+                    <span style="font-size: 12px; color: #1e40af;">ยอดขายรวมทั้งหมด</span>
+                    <h2 style="color: #1e3a8a;">฿<?php echo number_format($grand_total_revenue, 2); ?></h2>
                 </div>
-            <?php } ?>
-
-            <!-- สรุปภาพรวมยอดขาย -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 10px;">
-                    <p style="font-size: 12px; color: #166534;">ยอดขายรวมทั้งหมด</p>
-                    <h3 style="font-size: 20px; color: #15803d; font-weight: bold;">฿<?php echo number_format($grand_total_revenue, 2); ?></h3>
-                </div>
-                <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 10px;">
-                    <p style="font-size: 12px; color: #92400e;">สินค้าขายได้แล้ว</p>
-                    <h3 style="font-size: 20px; color: #b45309; font-weight: bold;"><?php echo number_format($grand_total_sold); ?> ชิ้น</h3>
-                </div>
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px;">
-                    <p style="font-size: 12px; color: #475569;">รายการสินค้าทั้งหมด</p>
-                    <h3 style="font-size: 20px; color: #1e293b; font-weight: bold;"><?php echo count($admin_products_data); ?> รายการ</h3>
+                <div style="flex: 1; background: #f0fdf4; padding: 15px; border-radius: 10px;">
+                    <span style="font-size: 12px; color: #166534;">จำนวนชิ้นที่ขายได้</span>
+                    <h2 style="color: #14532d;"><?php echo number_format($grand_total_sold); ?> ชิ้น</h2>
                 </div>
             </div>
 
-            <!-- ตารางรายการสินค้า + ปรับสต็อก -->
-            <h4 style="margin-bottom: 10px; font-size: 14px; color: #0f172a;">📦 รายการสินค้า ยอดขาย และปรับสต็อก</h4>
-            <table class="cart-table">
+            <h4>📦 รายการสินค้าและการจัดการสต็อก</h4>
+            <table class="cart-table" style="margin-top: 10px;">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>ชื่อสินค้า</th>
                         <th>ราคา</th>
-                        <th>ขายแล้ว</th>
-                        <th>ยอดขายรวม</th>
-                        <th>คงเหลือ</th>
-                        <th style="text-align: center;">แก้ไขสต็อก</th>
+                        <th>สต็อกคงเหลือ</th>
+                        <th>ขายได้แล้ว</th>
+                        <th>รายได้รวม</th>
+                        <th>ปรับสต็อก</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (count($admin_products_data) > 0) { ?>
-                        <?php foreach ($admin_products_data as $ap) { ?>
-                            <tr>
-                                <td>#<?php echo $ap['product_id']; ?></td>
-                                <td><b><?php echo htmlspecialchars($ap['product_name']); ?></b></td>
-                                <td>฿<?php echo number_format($ap['price'], 2); ?></td>
-                                <td><?php echo number_format($ap['total_sold']); ?></td>
-                                <td style="color: #16a34a; font-weight: bold;">฿<?php echo number_format($ap['total_revenue'], 2); ?></td>
-                                <td>
-                                    <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; <?php echo $ap['stock'] < 5 ? 'background: #fee2e2; color: #991b1b;' : 'background: #f1f5f9; color: #334155;'; ?>">
-                                        <?php echo number_format($ap['stock']); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <form action="c.php" method="POST" style="display: flex; gap: 5px; justify-content: center;">
-                                        <input type="hidden" name="product_id" value="<?php echo $ap['product_id']; ?>">
-                                        <input type="number" name="stock_qty" value="<?php echo $ap['stock']; ?>" min="0" style="width: 60px; padding: 3px; text-align: center; border: 1px solid #ccc; border-radius: 4px;">
-                                        <button type="submit" name="update_stock" style="background: #0f172a; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">
-                                            บันทึก
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php } ?>
-                    <?php } else { ?>
+                    <?php foreach ($admin_products_data as $ap) { ?>
                         <tr>
-                            <td colspan="7" style="text-align: center; color: var(--text-muted);">ไม่พบข้อมูลสินค้า</td>
+                            <td>#P<?php echo $ap['product_id']; ?></td>
+                            <td><?php echo htmlspecialchars($ap['product_name']); ?></td>
+                            <td>฿<?php echo number_format($ap['price'], 2); ?></td>
+                            <td><b><?php echo $ap['stock']; ?></b> ชิ้น</td>
+                            <td><?php echo $ap['total_sold']; ?></td>
+                            <td>฿<?php echo number_format($ap['total_revenue'], 2); ?></td>
+                            <td>
+                                <form action="c.php" method="POST" style="display: flex; gap: 5px;">
+                                    <input type="hidden" name="product_id" value="<?php echo $ap['product_id']; ?>">
+                                    <input type="number" name="stock_qty" value="<?php echo $ap['stock']; ?>" style="width: 60px; padding: 2px 5px;">
+                                    <button type="submit" name="update_stock" style="background: #10b981; color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">บันทึก</button>
+                                </form>
+                            </td>
                         </tr>
                     <?php } ?>
                 </tbody>
@@ -1022,198 +976,124 @@ $total_cart_items = array_sum($_SESSION['cart']);
     </div>
     <?php } ?>
 
-    <!-- 📋 ORDER SEARCH MODAL -->
-    <div class="modal-overlay" id="orderSearchModal">
-        <div class="modal-content large-modal">
+    <!-- ✉️ MODAL: USER AUTH -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content" style="max-width: 450px;">
             <div class="modal-header">
-                <h3>📋 ตรวจสอบรายการสั่งซื้อ</h3>
-                <button class="close-btn" onclick="closeOrderSearchModal()">&times;</button>
+                <h3>✉️ เข้าสู่ระบบลูกค้า</h3>
+                <button class="close-btn" onclick="closeAuthModal()">✕</button>
             </div>
-            <form action="c.php" method="POST" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" name="search_term" required placeholder="ป้อนเบอร์โทรศัพท์ หรือ รหัสคำสั่งซื้อ..." value="<?php echo htmlspecialchars($search_term_input); ?>" style="flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;">
-                <button type="submit" name="action_search_order" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">🔍 ค้นหา</button>
+            <form action="c.php" method="POST">
+                <div class="form-group">
+                    <label>อีเมล (Email):</label>
+                    <input type="email" name="login_email" required placeholder="yourname@example.com">
+                </div>
+                <div class="form-group">
+                    <label>ชื่อ-นามสกุล:</label>
+                    <input type="text" name="login_fullname" placeholder="ระบุชื่อของคุณ">
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทรศัพท์:</label>
+                    <input type="text" name="login_phone" placeholder="08X-XXX-XXXX">
+                </div>
+                <div class="form-group">
+                    <label>ที่อยู่จัดส่ง:</label>
+                    <textarea name="login_address" rows="2" placeholder="ที่อยู่สำหรับการจัดส่ง"></textarea>
+                </div>
+                <button type="submit" name="action_login_email" class="btn-submit-order">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 📋 MODAL: ORDER SEARCH -->
+    <div class="modal-overlay" id="orderSearchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 ตรวจสอบคำสั่งซื้อ</h3>
+                <button class="close-btn" onclick="closeOrderSearchModal()">✕</button>
+            </div>
+            <form action="c.php" method="POST" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" name="search_term" class="form-group" style="margin-bottom: 0;" placeholder="กรอกเบอร์โทรศัพท์ หรือ หมายเลขคำสั่งซื้อ..." value="<?php echo htmlspecialchars($search_term_input); ?>" required>
+                    <button type="submit" name="action_search_order" class="btn-submit-order" style="width: auto; padding: 0 20px; margin-top: 0;">ค้นหา</button>
+                </div>
             </form>
 
             <?php if ($has_searched) { ?>
-                <?php if (!empty($searched_orders)) { ?>
-                    <?php foreach ($searched_orders as $s_ord) { ?>
-                        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #fafafa;">
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px; font-size: 13px;">
-                                <span><b>คำสั่งซื้อ #<?php echo $s_ord['order_id']; ?></b></span>
-                                <span style="color: var(--text-muted);"><?php echo $s_ord['created_at']; ?></span>
+                <?php if (empty($searched_orders)) { ?>
+                    <p style="text-align: center; color: var(--text-muted); padding: 20px 0;">ไม่พบข้อมูลคำสั่งซื้อที่ตรงกับเงื่อนไข</p>
+                <?php } else { ?>
+                    <?php foreach ($searched_orders as $so) { ?>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 8px;">
+                                <b>หมายเลขคำสั่งซื้อ: #ORDER-<?php echo $so['order_id']; ?></b>
+                                <span style="font-size: 12px; color: var(--text-muted);"><?php echo $so['created_at']; ?></span>
                             </div>
-                            <p style="font-size: 13px; margin-bottom: 4px;">👤 <b>ผู้สั่งซื้อ:</b> <?php echo htmlspecialchars($s_ord['customer_name']); ?> (<?php echo htmlspecialchars($s_ord['customer_phone']); ?>)</p>
-                            <p style="font-size: 13px; margin-bottom: 10px;">📍 <b>ที่อยู่:</b> <?php echo htmlspecialchars($s_ord['customer_address']); ?></p>
+                            <p style="font-size: 13px;"><b>ผู้สั่งซื้อ:</b> <?php echo htmlspecialchars($so['customer_name']); ?> (<?php echo htmlspecialchars($so['customer_phone']); ?>)</p>
+                            <p style="font-size: 13px;"><b>ที่อยู่:</b> <?php echo htmlspecialchars($so['customer_address']); ?></p>
                             
-                            <table class="cart-table">
-                                <thead>
-                                    <tr>
-                                        <th>สินค้า</th>
-                                        <th>ราคา</th>
-                                        <th>จำนวน</th>
-                                        <th>รวม</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($s_ord['items'] as $s_item) { ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($s_item['product_name']); ?></td>
-                                            <td>฿<?php echo number_format($s_item['price'], 2); ?></td>
-                                            <td><?php echo $s_item['quantity']; ?></td>
-                                            <td>฿<?php echo number_format($s_item['price'] * $s_item['quantity'], 2); ?></td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                                <a href="c.php?receipt_id=<?php echo $s_ord['order_id']; ?>" style="color: var(--primary-accent); text-decoration: none; font-size: 12px; font-weight: 600;">🧾 ดูใบเสร็จ</a>
-                                <span style="font-weight: 700; color: var(--accent-orange-hover);">ยอดรวมทั้งสิ้น: ฿<?php echo number_format($s_ord['total_amount'], 2); ?></span>
+                            <div style="margin-top: 10px;">
+                                <?php foreach ($so['items'] as $item) { ?>
+                                    <div style="display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0;">
+                                        <span>• <?php echo htmlspecialchars($item['product_name']); ?> x <?php echo $item['quantity']; ?></span>
+                                        <span>฿<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: 10px; font-weight: 700; color: var(--accent-orange-hover);">
+                                ราคารวมทั้งหมด: ฿<?php echo number_format($so['total_amount'], 2); ?>
                             </div>
                         </div>
                     <?php } ?>
-                <?php } else { ?>
-                    <p style="text-align: center; color: var(--text-muted); padding: 20px;">ไม่พบรายการสั่งซื้อสำหรับข้อมูลที่คุณค้นหา</p>
                 <?php } ?>
             <?php } ?>
         </div>
     </div>
 
-    <!-- 📜 AUDIT LOG MODAL -->
+    <!-- 📜 MODAL: AUDIT LOG -->
     <div class="modal-overlay" id="auditLogModal">
         <div class="modal-content large-modal">
             <div class="modal-header">
-                <h3>📜 Audit Logs (ประวัติการใช้งานระบบ)</h3>
-                <button class="close-btn" onclick="closeAuditLogModal()">&times;</button>
+                <h3>📜 ประวัติการใช้งานระบบ (Audit Logs)</h3>
+                <button class="close-btn" onclick="closeAuditLogModal()">✕</button>
             </div>
             <table class="cart-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>ผู้ใช้งาน (User)</th>
+                        <th>ผู้ใช้งาน / อีเมล</th>
                         <th>เหตุการณ์ (Event)</th>
                         <th>IP Address</th>
-                        <th>เวลา</th>
+                        <th>วันที่ / เวลา</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($audit_logs_list)) { ?>
+                    <?php if (empty($audit_logs_list)) { ?>
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">ไม่มีข้อมูลบันทึกระบบ</td></tr>
+                    <?php } else { ?>
                         <?php foreach ($audit_logs_list as $log) { ?>
                             <tr>
                                 <td>#<?php echo $log['id']; ?></td>
                                 <td><?php echo htmlspecialchars($log['user']); ?></td>
                                 <td>
-                                    <?php if (strpos($log['event_type'], 'LOGIN') !== false) { ?>
-                                        <span class="badge-event login"><?php echo $log['event_type']; ?></span>
-                                    <?php } else { ?>
-                                        <span class="badge-event logout"><?php echo $log['event_type']; ?></span>
-                                    <?php } ?>
+                                    <span class="badge-event <?php echo strpos($log['event_type'], 'LOGIN') !== false ? 'login' : 'logout'; ?>">
+                                        <?php echo htmlspecialchars($log['event_type']); ?>
+                                    </span>
                                 </td>
                                 <td><?php echo htmlspecialchars($log['ip_address']); ?></td>
                                 <td><?php echo $log['created_at']; ?></td>
                             </tr>
                         <?php } ?>
-                    <?php } else { ?>
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted);">ยังไม่มีข้อมูลประวัติการใช้งาน</td>
-                        </tr>
                     <?php } ?>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- 🧾 RECEIPT MODAL -->
-    <?php if ($receipt_data) { ?>
-        <div class="modal-overlay active" id="receiptModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>🧾 ใบเสร็จรับเงิน (Receipt)</h3>
-                    <button class="close-btn" onclick="document.getElementById('receiptModal').classList.remove('active')">&times;</button>
-                </div>
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h2 style="color: var(--primary);">GUITAR REA STORE</h2>
-                    <p style="font-size: 12px; color: var(--text-muted);">ใบเสร็จรับเงินอย่างย่อ / คำสั่งซื้อ #<?php echo $receipt_data['order_id']; ?></p>
-                    <p style="font-size: 11px; color: var(--text-muted);"><?php echo $receipt_data['created_at']; ?></p>
-                </div>
-                <div style="font-size: 12px; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 6px;">
-                    <p><b>ลูกค้า:</b> <?php echo htmlspecialchars($receipt_data['customer_name']); ?></p>
-                    <p><b>เบอร์โทร:</b> <?php echo htmlspecialchars($receipt_data['customer_phone']); ?></p>
-                    <p><b>ที่อยู่จัดส่ง:</b> <?php echo htmlspecialchars($receipt_data['customer_address']); ?></p>
-                </div>
-                <table class="cart-table">
-                    <thead>
-                        <tr>
-                            <th>รายการ</th>
-                            <th>จำนวน</th>
-                            <th>ราคา/หน่วย</th>
-                            <th>รวม</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($receipt_items as $r_item) { ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($r_item['product_name']); ?></td>
-                                <td><?php echo $r_item['quantity']; ?></td>
-                                <td>฿<?php echo number_format($r_item['price'], 2); ?></td>
-                                <td>฿<?php echo number_format($r_item['price'] * $r_item['quantity'], 2); ?></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-                <div style="text-align: right; font-size: 16px; font-weight: 700; color: var(--accent-orange-hover); margin-top: 15px;">
-                    ยอดชำระสุทธิ: ฿<?php echo number_format($receipt_data['total_amount'], 2); ?>
-                </div>
-                <button onclick="window.print()" style="width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; margin-top: 15px; cursor: pointer;">🖨️ พิมพ์ใบเสร็จ</button>
-            </div>
-        </div>
-    <?php } ?>
-
-    <!-- 🌐 FOOTER -->
-    <footer class="site-footer">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h4>GUITAR REA STORE</h4>
-                <p>ร้านจำหน่ายกีตาร์และอุปกรณ์ดนตรีครบวงจร คัดสรรสินค้าคุณภาพเพื่อมิวสิเชียลทุกคน</p>
-            </div>
-            <div class="footer-col">
-                <h4>หมวดหมู่สินค้า</h4>
-                <p>กีตาร์ไฟฟ้า / กีตาร์โปร่ง</p>
-                <p>กีตาร์คลาสสิก / แอมป์กีตาร์</p>
-            </div>
-            <div class="footer-col">
-                <h4>การบริการลูกค้า</h4>
-                <p>ตรวจสอบคำสั่งซื้อ</p>
-                <p>การรับประกันสินค้า</p>
-            </div>
-            <div class="footer-col">
-                <h4>ติดต่อเรา</h4>
-                <p>📞 โทร: 02-123-4567</p>
-                <p>📧 อีเมล: contact@guitarrea.com</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- 📜 JAVASCRIPT -->
+    <!-- 📜 JAVASCRIPT CONTROLLERS -->
     <script>
-        // Hero Slider
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.hero-slide');
-        
-        function nextSlide() {
-            if (slides.length <= 1) return;
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
-        setInterval(nextSlide, 5000);
-
-        // Chatbot Toggle
-        function toggleChatbot() {
-            const bot = document.getElementById('chatbotWindow');
-            bot.classList.toggle('active');
-        }
-
-        // Modals Toggle
+        // Modal Handlers
         function openCartModal() { document.getElementById('cartModal').classList.add('active'); }
         function closeCartModal() { document.getElementById('cartModal').classList.remove('active'); }
 
@@ -1232,29 +1112,19 @@ $total_cart_items = array_sum($_SESSION['cart']);
         function openAuditLogModal() { document.getElementById('auditLogModal').classList.add('active'); }
         function closeAuditLogModal() { document.getElementById('auditLogModal').classList.remove('active'); }
 
-        // Category Filter
-        function filterCategory(catId, btn) {
-            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const groups = document.querySelectorAll('.product-section-group');
-            groups.forEach(group => {
-                if (catId === 'all' || group.getAttribute('data-catid') == catId) {
-                    group.style.display = 'block';
-                } else {
-                    group.style.display = 'none';
-                }
-            });
+        function toggleChatbot() {
+            const chatWin = document.getElementById('chatbotWindow');
+            chatWin.classList.toggle('active');
         }
 
         // Search Filter
         function filterProducts() {
-            const term = document.getElementById('searchInput').value.toLowerCase().trim();
+            const input = document.getElementById('searchInput').value.toLowerCase();
             const cards = document.querySelectorAll('.product-card');
 
             cards.forEach(card => {
-                const title = card.getAttribute('data-title');
-                if (title.includes(term)) {
+                const name = card.getAttribute('data-name');
+                if (name.includes(input)) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
@@ -1262,10 +1132,41 @@ $total_cart_items = array_sum($_SESSION['cart']);
             });
         }
 
-        // Auto Open URL Parameters Check
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('open_cart')) { openCartModal(); }
-        if (urlParams.has('admin_panel')) { openAdminDashboardModal(); }
+        // Category Filter
+        function filterCategory(catClass) {
+            document.querySelectorAll('.cat-pill').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const blocks = document.querySelectorAll('.cat-block');
+            if (catClass === 'all') {
+                blocks.forEach(b => b.style.display = 'block');
+            } else {
+                blocks.forEach(b => {
+                    if (b.classList.contains(catClass)) {
+                        b.style.display = 'block';
+                    } else {
+                        b.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Auto open modals if URL params exist
+        <?php if (isset($_GET['open_cart'])) { ?> openCartModal(); <?php } ?>
+        <?php if ($has_searched) { ?> openOrderSearchModal(); <?php } ?>
+        <?php if (isset($_GET['admin_panel']) && isset($_SESSION['admin_login'])) { ?> openAdminDashboardModal(); <?php } ?>
+        <?php if (!empty($admin_error)) { ?> 
+            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: '<?php echo $admin_error; ?>' }); 
+            openAdminLoginModal();
+        <?php } ?>
+        <?php if ($show_receipt_id > 0) { ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'สั่งซื้อสำเร็จ!',
+                text: 'หมายเลขคำสั่งซื้อของคุณคือ #ORDER-<?php echo $show_receipt_id; ?>',
+                confirmButtonText: 'ตกลง'
+            });
+        <?php } ?>
     </script>
 </body>
 </html>
