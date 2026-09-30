@@ -2,19 +2,18 @@
 session_start();
 require_once 'connectdb.php';
 
-// ตรวจสอบชื่อตัวแปรเชื่อมต่อ DB
 if (!isset($conn) && isset($db)) { $conn =$db; }
 if (!isset($conn) && isset($con)) { $conn =$con; }
 
 $error = '';
 
-if (isset($_POST['login_admin'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_admin'])) {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
     if (!$conn) {$error = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบไฟล์ connectdb.php";
     } else {
-        // ค้นหาตารางแอดมินที่มีอยู่ในฐานข้อมูล
+        // 1. ค้นหาตารางแอดมินที่มีอยู่ในฐานข้อมูล
         $table_found = '';$possible_tables = ['admin', 'admins', 'tb_admin', 'tbl_admin', 'users'];
 
         foreach ($possible_tables as$tb) {
@@ -27,44 +26,37 @@ if (isset($_POST['login_admin'])) {
 
         if (empty($table_found)) {$error = "ไม่พบตารางข้อมูลผู้ดูแลระบบในฐานข้อมูล";
         } else {
-            $username_clean = mysqli_real_escape_string($conn, $username);$password_clean = mysqli_real_escape_string($conn,$password);
-
-            // ดึงชื่อคอลัมน์ทั้งหมดในตารางเพื่อป้องกันข้อผิดพลาดคอลัมน์ไม่มีจริง
+            // 2. ดึงชื่อคอลัมน์ทั้งหมดของตารางนั้นมาตรวจสอบ
             $col_res = mysqli_query($conn, "SHOW COLUMNS FROM `$table_found`");
             $columns = [];
             while ($c = mysqli_fetch_assoc($col_res)) {
-                $columns[] =$c['Field'];
+                $columns[] = strtolower($c['Field']);
             }
 
-            // สร้างเงื่อนไขในการค้นหาเฉพาะคอลัมน์ที่มีอยู่จริงในตาราง
-            $where_conditions = [];$search_fields = ['name', 'username', 'user', 'email', 'admin_name', 'admin_user'];
-            
-            foreach ($search_fields as$field) {
-                if (in_array($field, $columns)) {$where_conditions[] = "`$field` = '$username_clean'";
-                }
+            $username_clean = mysqli_real_escape_string($conn, $username);$password_clean = mysqli_real_escape_string($conn,$password);
+
+            // 3. ตรวจหาคอลัมน์ชื่อผู้ใช้และรหัสผ่านจากที่มีอยู่จริงในตาราง
+            $user_col = '';
+            foreach (['name', 'username', 'user', 'email', 'admin_name', 'admin_user', 'a_username'] as $f) {
+                if (in_array($f,$columns)) { $user_col =$f; break; }
             }
+            if (!$user_col && count($columns) > 0) {$user_col = $columns[1] ?? $columns[0]; }
 
-            // ถ้าไม่มีคอลัมน์ชื่อตรงเลย ให้ลองค้นหาคอลัมน์แรกสุดของตาราง
-            if (empty($where_conditions) && !empty($columns)) {$where_conditions[] = "`{$columns[0]}` = '$username_clean'";
+            $pass_col = '';
+            foreach (['password', 'pass', 'pwd', 'admin_password', 'a_pass'] as $p) {
+                if (in_array($p,$columns)) { $pass_col =$p; break; }
             }
+            if (!$pass_col && count($columns) > 1) {$pass_col = $columns[2] ?? $columns[1]; }
 
-            $where_sql = implode(' OR ',$where_conditions);
-            
-            // เช็ครหัสผ่าน
-            $pass_field = in_array('password',$columns) ? 'password' : (in_array('pass', $columns) ? 'pass' :$columns[1] ?? 'password');
-
-            $sql = "SELECT * FROM `$table_found` WHERE ($where_sql) AND `$pass_field` = '$password_clean' LIMIT 1";
-            
+            // 4. สั่ง Query โดยใช้คอลัมน์ที่ตรวจพบจริงเท่านั้น
+            $sql = "SELECT * FROM `$table_found` WHERE `$user_col` = '$username_clean' AND `$pass_col` = '$password_clean' LIMIT 1";
             $rs = @mysqli_query($conn,$sql);
 
             if ($rs && mysqli_num_rows($rs) > 0) {$row = mysqli_fetch_assoc($rs);$_SESSION['admin_login'] = true;
                 $_SESSION['admin']       =$username;
                 $_SESSION['role']        = 'admin';$_SESSION['admin_id']    = $row['admin_id'] ?? $row['id'] ?? 1;
-                $_SESSION['user_name']   = $row['name'] ?? $row['username'] ?? $row['user'] ?? $username;
-                $_SESSION['username']    = $_SESSION['user_name'];$_SESSION['user'] = [
-                    'fullname' => $_SESSION['user_name'],
-                    'email'    => $username
-                ];
+                $_SESSION['user_name']   = $row[$user_col] ?? 'Admin';
+                $_SESSION['username']    =$_SESSION['user_name'];
 
                 header("Location: admin.php");
                 exit;
@@ -101,7 +93,7 @@ if (isset($_POST['login_admin'])) {
         <form method="post">
             <div class="form-group">
                 <label>ชื่อผู้ใช้ หรือ อีเมล</label>
-                <input type="text" name="username" placeholder="admin34 หรือ อีเมล" required>
+                <input type="text" name="username" placeholder="กรอกชื่อผู้ใช้" required>
             </div>
             <div class="form-group">
                 <label>รหัสผ่าน (Password)</label>
