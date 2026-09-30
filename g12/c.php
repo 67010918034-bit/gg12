@@ -2,8 +2,19 @@
 session_start();
 require_once 'connectdb.php';
 
+// ฟังก์ชันสำหรับดึง IP Address ของผู้ใช้งาน
+function getClientIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    }
+}
+
 // ---------------------------------------------------------------------
-// 📌 ระบบเข้าสู่ระบบด้วยอีเมล
+// 📌 ระบบเข้าสู่ระบบด้วยอีเมล + บันทึก Audit Log
 // ---------------------------------------------------------------------
 $auth_error = '';
 
@@ -20,17 +31,38 @@ if (isset($_POST['action_login_email'])) {
             'phone'    => $phone,
             'address'  => $address
         ];
-        
-        // 🟢 เปลี่ยนทิศทางเมื่อล็อกอินสำเร็จไปยัง audit_logs.php
-        header("Location: audit_logs.php");
+
+        // 🟢 บันทึก Audit Log เมื่อเข้าสู่ระบบสำเร็จลงตาราง audit_logs
+        $user_val   = mysqli_real_escape_string($conn, $email);
+        $event_type = 'LOGIN_SUCCESS';
+        $ip_addr    = mysqli_real_escape_string($conn, getClientIP());
+
+        $sql_log = "INSERT INTO audit_logs (user, event_type, ip_address, created_at) 
+                    VALUES ('$user_val', '$event_type', '$ip_addr', NOW())";
+        @mysqli_query($conn, $sql_log);
+
+        // รีไดเรกต์กลับหน้าเดิม c.php พร้อมการล็อกอินเรียบร้อย
+        header("Location: c.php");
         exit;
     } else {
         $auth_error = 'กรุณากรอกรูปแบบอีเมลให้ถูกต้อง';
     }
 }
 
-// ออกจากระบบ
+// ---------------------------------------------------------------------
+// 📌 ออกจากระบบ + บันทึก Audit Log
+// ---------------------------------------------------------------------
 if (isset($_GET['action']) && $_GET['action'] == 'logout') {
+    if (isset($_SESSION['user']['email'])) {
+        $user_val   = mysqli_real_escape_string($conn, $_SESSION['user']['email']);
+        $event_type = 'LOGOUT';
+        $ip_addr    = mysqli_real_escape_string($conn, getClientIP());
+
+        $sql_log = "INSERT INTO audit_logs (user, event_type, ip_address, created_at) 
+                    VALUES ('$user_val', '$event_type', '$ip_addr', NOW())";
+        @mysqli_query($conn, $sql_log);
+    }
+
     unset($_SESSION['user']);
     header("Location: c.php");
     exit;
@@ -573,7 +605,7 @@ $total_cart_items = array_sum($_SESSION['cart']);
                 </div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon">🛡️</span>
+                <span class="feature-icon">🛡️️</span>
                 <div class="feature-text">
                     <h4>รับประกันสินค้าแท้</h4>
                     <p>รับประกันศูนย์ไทย 100%</p>
