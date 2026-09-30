@@ -43,13 +43,22 @@ if (isset($_POST['login_admin'])) {
             if ($rs && mysqli_num_rows($rs) > 0) {
                 $row = mysqli_fetch_assoc($rs);
                 
-                // ตั้งค่า Session รองรับการใช้งานของ c.php
+                // -------------------------------------------------------------
+                // 🎯 ตั้งค่า Session สำหรับล็อกอิน
+                // -------------------------------------------------------------
                 $_SESSION['admin_login'] = true;
+                $_SESSION['admin']       =$row['username'] ?? $row['name'] ?? $row['email'] ?? 'Admin';
                 $_SESSION['role']        = 'admin';$_SESSION['admin_id']    = $row['admin_id'] ?? $row['id'] ?? 1;
                 $_SESSION['user_name']   =$row['name'] ?? $row['username'] ?? $row['user'] ?? 'Admin';
                 $_SESSION['username']    =$_SESSION['user_name'];
+                
+                // สำหรับไฟล์ c.php หรือระบบอื่นที่เรียกใช้ $_SESSION['user']$_SESSION['user'] = [
+                    'fullname' => $_SESSION['user_name'],
+                    'email'    => $username
+                ];
 
-                header("Location: c.php");
+                // 🚀 เปลี่ยนเป้าหมายเป็น admin.php (หน้าจัดการสต็อก & ยอดขาย)
+                header("Location: admin.php");
                 exit;
             } else {
                 $error = 'ชื่อผู้ใช้/อีเมล หรือรหัสผ่านไม่ถูกต้อง!';
@@ -92,7 +101,7 @@ if (isset($_POST['login_admin'])) {
             </div>
             <button type="submit" name="login_admin" class="btn-login">เข้าสู่ระบบ</button>
         </form>
-        <a href="c.php" class="btn-back">⬅️️ กลับหน้าหลักร้านค้า</a>
+        <a href="c.php" class="btn-back">⬅ กลับหน้าหลักร้านค้า</a>
     </div>
 </body>
 </html>
