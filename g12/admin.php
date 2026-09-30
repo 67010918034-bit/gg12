@@ -3,195 +3,113 @@ session_start();
 require_once 'connectdb.php';
 
 // ตรวจสอบชื่อตัวแปรเชื่อมต่อ DB
-if (!isset($conn) && isset($db)) { $conn = $db; }
-if (!isset($conn) && isset($con)) { $conn = $con; }
+if (!isset($conn) && isset($db)) { $conn =$db; }
+if (!isset($conn) && isset($con)) { $conn =$con; }
 
-// ตรวจสอบการเข้าสู่ระบบ
-if (!isset($_SESSION['admin_login']) && !isset($_SESSION['admin'])) {
-    header("Location: admin_login.php");
-    exit;
-}
+$error = '';
 
-// ---------------------------------------------------------------------
-// 📌 จัดการอัปเดตสต็อกสินค้า
-// ---------------------------------------------------------------------
-$msg = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_stock'])) {
-    $p_id = intval($_POST['product_id']);
-    $new_stock = intval($_POST['stock_qty']);
-    
-    $update_sql = "UPDATE products SET stock = $new_stock WHERE product_id = $p_id";
-    if (mysqli_query($conn, $update_sql)) {
-        $msg = "อัปเดตสต็อกสินค้าเรียบร้อยแล้ว!";
-    }
-}
+if (isset($_POST['login_admin'])) {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-// ---------------------------------------------------------------------
-// 📌 ดึงข้อมูลสินค้า + คำนวณยอดขายจาก order_items
-// ---------------------------------------------------------------------
-$sql_summary = "SELECT 
-                    p.product_id, 
-                    p.product_name, 
-                    p.price, 
-                    p.stock, 
-                    COALESCE(SUM(oi.quantity), 0) AS total_sold,
-                    COALESCE(SUM(oi.quantity * oi.price), 0) AS total_revenue
-                FROM products p
-                LEFT JOIN order_items oi ON p.product_id = oi.product_id
-                GROUP BY p.product_id
-                ORDER BY p.product_id ASC";
+    if (!$conn) {$error = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบไฟล์ connectdb.php";
+    } else {
+        // ค้นหาตารางแอดมินที่มีอยู่ในฐานข้อมูล
+        $table_found = '';$possible_tables = ['admin', 'admins', 'tb_admin', 'tbl_admin', 'users'];
 
-$result_summary = mysqli_query($conn, $sql_summary);
+        foreach ($possible_tables as$tb) {
+            $check = @mysqli_query($conn, "SHOW TABLES LIKE '$tb'");
+            if ($check && mysqli_num_rows($check) > 0) {
+                $table_found =$tb;
+                break;
+            }
+        }
 
-// คำนวณยอดขายรวมทั้งหมด
-$grand_total_sold = 0;
-$grand_total_revenue = 0;
-$products_data = [];
+        if (empty($table_found)) {$error = "ไม่พบตารางข้อมูลผู้ดูแลระบบในฐานข้อมูล";
+        } else {
+            $username_clean = mysqli_real_escape_string($conn, $username);$password_clean = mysqli_real_escape_string($conn,$password);
 
-if ($result_summary) {
-    while ($row = mysqli_fetch_assoc($result_summary)) {
-        $grand_total_sold += $row['total_sold'];
-        $grand_total_revenue += $row['total_revenue'];
-        $products_data[] = $row;
+            // ดึงชื่อคอลัมน์ทั้งหมดในตารางเพื่อป้องกันข้อผิดพลาดคอลัมน์ไม่มีจริง
+            $col_res = mysqli_query($conn, "SHOW COLUMNS FROM `$table_found`");
+            $columns = [];
+            while ($c = mysqli_fetch_assoc($col_res)) {
+                $columns[] =$c['Field'];
+            }
+
+            // สร้างเงื่อนไขในการค้นหาเฉพาะคอลัมน์ที่มีอยู่จริงในตาราง
+            $where_conditions = [];$search_fields = ['name', 'username', 'user', 'email', 'admin_name', 'admin_user'];
+            
+            foreach ($search_fields as$field) {
+                if (in_array($field, $columns)) {$where_conditions[] = "`$field` = '$username_clean'";
+                }
+            }
+
+            // ถ้าไม่มีคอลัมน์ชื่อตรงเลย ให้ลองค้นหาคอลัมน์แรกสุดของตาราง
+            if (empty($where_conditions) && !empty($columns)) {$where_conditions[] = "`{$columns[0]}` = '$username_clean'";
+            }
+
+            $where_sql = implode(' OR ',$where_conditions);
+            
+            // เช็ครหัสผ่าน
+            $pass_field = in_array('password',$columns) ? 'password' : (in_array('pass', $columns) ? 'pass' :$columns[1] ?? 'password');
+
+            $sql = "SELECT * FROM `$table_found` WHERE ($where_sql) AND `$pass_field` = '$password_clean' LIMIT 1";
+            
+            $rs = @mysqli_query($conn,$sql);
+
+            if ($rs && mysqli_num_rows($rs) > 0) {$row = mysqli_fetch_assoc($rs);$_SESSION['admin_login'] = true;
+                $_SESSION['admin']       =$username;
+                $_SESSION['role']        = 'admin';$_SESSION['admin_id']    = $row['admin_id'] ?? $row['id'] ?? 1;
+                $_SESSION['user_name']   = $row['name'] ?? $row['username'] ?? $row['user'] ?? $username;
+                $_SESSION['username']    = $_SESSION['user_name'];$_SESSION['user'] = [
+                    'fullname' => $_SESSION['user_name'],
+                    'email'    => $username
+                ];
+
+                header("Location: admin.php");
+                exit;
+            } else {
+                $error = 'ชื่อผู้ใช้/อีเมล หรือรหัสผ่านไม่ถูกต้อง!';
+            }
+        }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบหลังบ้าน - Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <title>เข้าสู่ระบบผู้ดูแลระบบ - BAIKWANG STORE</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background: #0f2027; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
+        .login-card { background: white; padding: 35px 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .login-card h2 { font-size: 20px; color: #1e3799; text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .btn-login { width: 100%; background: #1e3799; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-login:hover { background: #0c2461; }
+        .error-msg { background: #ffe6e6; color: red; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; line-height: 1.4; }
+        .btn-back { display: block; text-align: center; margin-top: 15px; color: #777; font-size: 12px; text-decoration: none; }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen">
-
-    <!-- Navbar -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-amber-500 text-slate-900 p-2 rounded-lg font-bold text-lg">
-                    <i class="fa-solid fa-user-shield"></i>
-                </div>
-                <h1 class="text-xl font-bold tracking-wide">ระบบจัดการหลังร้าน (Admin Dashboard)</h1>
+<body>
+    <div class="login-card">
+        <h2>🔐 เข้าสู่ระบบผู้ดูแลระบบ</h2>
+        <?php if ($error != '') { echo "<div class='error-msg'>$error</div>"; } ?>
+        <form method="post">
+            <div class="form-group">
+                <label>ชื่อผู้ใช้ หรือ อีเมล</label>
+                <input type="text" name="username" placeholder="admin34 หรือ อีเมล" required>
             </div>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-slate-300">ผู้ใช้งาน: <strong class="text-amber-400"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?></strong></span>
-                <a href="c.php" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3.5 py-1.5 rounded-lg text-sm transition">
-                    <i class="fa-solid fa-store"></i> ไปหน้าร้านค้า
-                </a>
+            <div class="form-group">
+                <label>รหัสผ่าน (Password)</label>
+                <input type="password" name="password" placeholder="••••••••" required>
             </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
-
-        <?php if (!empty($msg)): ?>
-            <div class="bg-emerald-500 text-white px-4 py-3 rounded-xl shadow-md font-medium flex items-center gap-2">
-                <i class="fa-solid fa-circle-check"></i> <?= $msg ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- Cards สรุปภาพรวม -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">ยอดขายรวมทั้งหมด</p>
-                    <h3 class="text-2xl font-bold text-emerald-600 mt-1">฿<?= number_format($grand_total_revenue, 2) ?></h3>
-                </div>
-                <div class="bg-emerald-100 text-emerald-600 p-4 rounded-xl text-2xl">
-                    <i class="fa-solid fa-money-bill-wave"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">จำนวนสินค้าที่ขายได้รวม</p>
-                    <h3 class="text-2xl font-bold text-amber-600 mt-1"><?= number_format($grand_total_sold) ?> <span class="text-sm font-normal text-slate-500">ชิ้น</span></h3>
-                </div>
-                <div class="bg-amber-100 text-amber-600 p-4 rounded-xl text-2xl">
-                    <i class="fa-solid fa-boxes-packing"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-500 font-medium">รายการสินค้าทั้งหมด</p>
-                    <h3 class="text-2xl font-bold text-slate-800 mt-1"><?= count($products_data) ?> <span class="text-sm font-normal text-slate-500">รายการ</span></h3>
-                </div>
-                <div class="bg-slate-100 text-slate-700 p-4 rounded-xl text-2xl">
-                    <i class="fa-solid fa-list"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- ตารางแสดงรายการและแก้ไขสต็อก -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-5 border-b border-slate-100 bg-slate-50">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-amber-500"></i> รายการสินค้า สต็อก และยอดขาย
-                </h2>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-900 text-white text-sm">
-                            <th class="p-4">รหัสสินค้า</th>
-                            <th class="p-4">ชื่อสินค้า</th>
-                            <th class="p-4 text-right">ราคา/ชิ้น</th>
-                            <th class="p-4 text-center">ขายแล้ว (ชิ้น)</th>
-                            <th class="p-4 text-right">ยอดขายรวม</th>
-                            <th class="p-4 text-center">คงเหลือในสต็อก</th>
-                            <th class="p-4 text-center">แก้ไขสต็อก</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 text-sm">
-                        <?php if (count($products_data) > 0): ?>
-                            <?php foreach ($products_data as $p): ?>
-                                <tr class="hover:bg-slate-50 transition">
-                                    <td class="p-4 font-mono text-slate-500">#<?= $p['product_id'] ?></td>
-                                    <td class="p-4 font-bold text-slate-800"><?= htmlspecialchars($p['product_name']) ?></td>
-                                    <td class="p-4 text-right font-medium">฿<?= number_format($p['price'], 2) ?></td>
-                                    <td class="p-4 text-center">
-                                        <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold">
-                                            <?= number_format($p['total_sold']) ?>
-                                        </span>
-                                    </td>
-                                    <td class="p-4 text-right font-bold text-emerald-600">
-                                        ฿<?= number_format($p['total_revenue'], 2) ?>
-                                    </td>
-                                    <td class="p-4 text-center">
-                                        <span class="px-3 py-1 rounded-full font-bold <?= $p['stock'] < 5 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700' ?>">
-                                            <?= number_format($p['stock']) ?>
-                                        </span>
-                                    </td>
-                                    <td class="p-4">
-                                        <form method="POST" class="flex justify-center items-center gap-2">
-                                            <input type="hidden" name="product_id" value="<?= $p['product_id'] ?>">
-                                            <input type="number" name="stock_qty" value="<?= $p['stock'] ?>" min="0" class="w-20 px-2 py-1 border rounded-lg text-center font-bold focus:ring-2 focus:ring-amber-500 outline-none">
-                                            <button type="submit" name="update_stock" class="bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-white font-bold px-3 py-1 rounded-lg text-xs transition">
-                                                บันทึก
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="7" class="text-center p-6 text-slate-400">ไม่พบข้อมูลสินค้า</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </main>
-
+            <button type="submit" name="login_admin" class="btn-login">เข้าสู่ระบบ</button>
+        </form>
+        <a href="c.php" class="btn-back">⬅ กลับหน้าหลักร้านค้า</a>
+    </div>
 </body>
 </html>
